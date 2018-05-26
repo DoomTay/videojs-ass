@@ -8,7 +8,7 @@
   var vjs_ass = function (options) {
     var cur_id = 0,
       id_count = 0,
-      overlay = document.createElement('div'),
+      overlay = null,
       clocks = [],
       clockRate = options.rate || 1,
       delay = options.delay || 0,
@@ -24,19 +24,27 @@
       return;
     }
 
-    overlay.className = 'vjs-ass';
+    var Component = videojs.getComponent('Component');
 
-    OverlayComponent = {
-      name: function () {
-        return 'AssOverlay';
+    OverlayComponent = videojs.extend(Component, {
+      constructor: function(player, options) {
+        Component.apply(this, arguments);
       },
-      el: function () {
-        return overlay;
-      }
-    }
 
-    player.addChild(OverlayComponent, {}, 3);
+      createEl: function() {
+        return videojs.createEl('div', {
+          className: 'vjs-ass'
+        });
+      },
+    });
 
+    videojs.registerComponent('AssOverlay', OverlayComponent);
+
+    player.addChild('AssOverlay', {}, 3);
+
+    var overlayChild = player.getChild("AssOverlay");
+    overlay = overlayChild.el();
+    
     function getCurrentTime() {
       return player.currentTime() - delay;
     }
@@ -102,10 +110,10 @@
       });
 
       if (activeTrack) {
-        overlay.style.display = '';
+        overlayChild.show();
         switchTrackTo(assTrackIdMap[activeTrack.language + activeTrack.label]);
       } else {
-        overlay.style.display = 'none';
+        overlayChild.hide();
       }
     })
 
