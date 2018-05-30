@@ -124,6 +124,10 @@
 
         addTrack(options.src, { label: options.label, srclang: options.srclang, switchImmediately: true });
         renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
+		renderers[cur_id].addEventListener('ready', function () {
+          updateDisplayArea();
+          clocks[cur_id].play();
+        });
       }
     );
 
@@ -195,7 +199,10 @@
           cur_id = ++id_count;
           clocks[cur_id] = new libjass.renderers.AutoClock(getCurrentTime, 500);
           renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
-          updateDisplayArea();
+          renderers[cur_id].addEventListener('ready', function () {
+            updateDisplayArea();
+            clocks[cur_id].play();
+          });
 
           if (switchImmediately) {
             clocks[cur_id].play();
