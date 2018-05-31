@@ -64,7 +64,7 @@ videojs('player_id', {
    as they might not expose the video dimensions to the player.
 
 ### Adding new tracks
-New subtitle tracks can be loaded like source
+New subtitle tracks can be loaded like so
 
 ```
 vjs_ass.loadNewSubtitle("subs/subtitles-it.ass","Italiano","it",false)
