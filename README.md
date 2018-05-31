@@ -46,6 +46,7 @@ videojs('player_id', {
 | ----------- | ------------- | ---------------------------------------------------------- |
 | src         | -<sup>1</sup> | `.ass` / `.ssa` source.                                    |
 | label       | -<sup>2</sup> | subtitle track label that shows up in the subtitles picker |
+| srclang     | -             | two-letter code for the subtitle track                     |
 | delay       | 0<sup>3</sup> | delay subtitle rendering by the specified value in seconds |
 | rate        | 1             | subtitle update speed relative to video playback rate      |
 | enableSvg   | true          | see [here][svg-effects] regarding SVG filter               |
@@ -61,6 +62,20 @@ videojs('player_id', {
 3. Value can be negative
 4. Generally, you should set these values when using external videojs providers
    as they might not expose the video dimensions to the player.
+
+### Adding new tracks
+New subtitle tracks can be loaded like source
+
+```
+vjs_ass.loadNewSubtitle("subs/subtitles-it.ass","Italiano","it",false)
+```
+
+Where the arguments are
+
+* `.ass` / `.ssa` source
+* Label
+* Language code
+* Switch to this new track immediately? (Can be either `true` or `false`)
 
 [svg-effects]: https://github.com/Arnavion/libjass/blob/v0.10.0/README.md#what-browser-and-javascript-features-does-libjass-need
 [font-map]: https://arnavion.github.io/libjass/api.xhtml#libjass.renderers.RendererSettings.fontMap
