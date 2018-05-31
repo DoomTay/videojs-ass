@@ -43,10 +43,6 @@
 
     clocks[cur_id] = new libjass.renderers.AutoClock(getCurrentTime, 500);
 
-    player.on('play', function () {
-      clocks[cur_id].play();
-    });
-
     player.on('pause', function () {
       clocks[cur_id].pause();
     });
@@ -126,7 +122,9 @@
         renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
 		renderers[cur_id].addEventListener('ready', function () {
           updateDisplayArea();
-          clocks[cur_id].play();
+          player.on('play', function () {
+            clocks[cur_id].play();
+          });
         });
       }
     );
