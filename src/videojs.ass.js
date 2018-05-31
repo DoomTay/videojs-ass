@@ -120,7 +120,7 @@
 
         addTrack(options.src, { label: options.label, srclang: options.srclang, switchImmediately: true });
         renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
-		renderers[cur_id].addEventListener('ready', function () {
+        renderers[cur_id].addEventListener('ready', function () {
           updateDisplayArea();
           player.on('play', function () {
             clocks[cur_id].play();
