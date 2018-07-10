@@ -7,7 +7,7 @@
 
   var vjs_ass = function (options) {
     var cur_id = 0,
-      id_count = 0,
+      id_count = -1,
       overlay = document.createElement('div'),
       clocks = [],
       clockRate = options.rate || 1,
@@ -43,16 +43,28 @@
 
     clocks[cur_id] = new libjass.renderers.AutoClock(getCurrentTime, 500);
 
+    player.on('play', function () {
+      if (clocks[cur_id]) {
+        clocks[cur_id].play();
+      }
+    });
+	
     player.on('pause', function () {
-      clocks[cur_id].pause();
+      if (clocks[cur_id]) {
+        clocks[cur_id].pause();
+      }
     });
 
     player.on('seeking', function () {
-      clocks[cur_id].seeking();
+      if (clocks[cur_id]) {
+        clocks[cur_id].seeking();
+      }
     });
 
     function updateClockRate() {
-      clocks[cur_id].setRate(player.playbackRate() * clockRate);
+      if (clocks[cur_id]) {
+        clocks[cur_id].setRate(player.playbackRate() * clockRate);
+      }
     }
 
     updateClockRate();
@@ -71,8 +83,10 @@
           subsWrapperHeight = videoHeight * ratio,
           subsWrapperLeft = (videoOffsetWidth - subsWrapperWidth) / 2,
           subsWrapperTop = (videoOffsetHeight - subsWrapperHeight) / 2;
-
-        renderers[cur_id].resize(subsWrapperWidth, subsWrapperHeight, subsWrapperLeft, subsWrapperTop);
+		  
+        if (renderers[cur_id]) {
+          renderers[cur_id].resize(subsWrapperWidth, subsWrapperHeight, subsWrapperLeft, subsWrapperTop);
+        }
       }, 100);
     }
 
@@ -106,28 +120,17 @@
     })
 
     rendererSettings = new libjass.renderers.RendererSettings();
-    libjass.ASS.fromUrl(options.src, libjass.Format.ASS).then(
-      function (ass) {
-        if (options.hasOwnProperty('enableSvg')) {
-          rendererSettings.enableSvg = options.enableSvg;
-        }
-        if (options.hasOwnProperty('fontMap')) {
-          rendererSettings.fontMap = new libjass.Map(options.fontMap);
-        } else if (options.hasOwnProperty('fontMapById')) {
-          rendererSettings.fontMap = libjass.renderers.RendererSettings
-            .makeFontMapFromStyleElement(document.getElementById(options.fontMapById));
-        }
+    if (options.hasOwnProperty('enableSvg')) {
+      rendererSettings.enableSvg = options.enableSvg;
+    }
+    if (options.hasOwnProperty('fontMap')) {
+      rendererSettings.fontMap = new libjass.Map(options.fontMap);
+    } else if (options.hasOwnProperty('fontMapById')) {
+      rendererSettings.fontMap = libjass.renderers.RendererSettings
+        .makeFontMapFromStyleElement(document.getElementById(options.fontMapById));
+    }
 
-        addTrack(options.src, { label: options.label, srclang: options.srclang, switchImmediately: true });
-        renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
-        renderers[cur_id].addEventListener('ready', function () {
-          updateDisplayArea();
-          player.on('play', function () {
-            clocks[cur_id].play();
-          });
-        });
-      }
-    );
+	loadNewSubtitle(options.src, options.label, options.srclang, true);
 
     function addTrack(url, opts) {
       var newTrack = player.addRemoteTextTrack({
@@ -166,9 +169,11 @@
     }
 
     function switchTrackTo(selected_track_id) {
-      renderers[cur_id]._removeAllSubs();
-      renderers[cur_id]._preRenderedSubs.clear();
-      renderers[cur_id].clock.disable();
+      if (renderers[cur_id]) {
+        renderers[cur_id]._removeAllSubs();
+        renderers[cur_id]._preRenderedSubs.clear();
+        renderers[cur_id].clock.disable();
+      }
 
       cur_id = selected_track_id;
       if (cur_id == undefined) {
@@ -186,7 +191,7 @@
     */
     function loadNewSubtitle(url, label, srclang, switchImmediately) {
       var old_id = cur_id;
-      if (switchImmediately) {
+      if (renderers[cur_id] && switchImmediately) {
         renderers[cur_id]._removeAllSubs();
         renderers[cur_id]._preRenderedSubs.clear();
         renderers[cur_id].clock.disable();
