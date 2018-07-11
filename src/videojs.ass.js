@@ -41,8 +41,6 @@
       return player.currentTime() - delay;
     }
 
-    clocks[cur_id] = new libjass.renderers.AutoClock(getCurrentTime, 500);
-
     player.on('play', function () {
       if (clocks[cur_id]) {
         clocks[cur_id].play();
@@ -204,12 +202,9 @@
           renderers[cur_id] = new libjass.renderers.WebRenderer(ass, clocks[cur_id], overlay, rendererSettings);
           renderers[cur_id].addEventListener('ready', function () {
             updateDisplayArea();
-            clocks[cur_id].play();
           });
 
-          if (switchImmediately) {
-            clocks[cur_id].play();
-          } else {
+          if (!switchImmediately) {
             renderers[cur_id]._removeAllSubs();
             renderers[cur_id]._preRenderedSubs.clear();
             renderers[cur_id].clock.disable();
